@@ -34,9 +34,11 @@ def map_img_to_codes (images,code_dic):
         #print(img + ': ' + codes[i])
     return codes
         
-def rerank(image_name,num,code_dic,query):
+def rerank(image_name,num,nrnk,code_dic,query):
     #read the coarse retrieval result in the file,then find the corresponding binary code
-    print('query: '+query)
+    #print('query: '+query)
+    
+    
     sub_image = image_name[:num]
     codes = map_img_to_codes(sub_image,code_dic)
           
@@ -48,6 +50,12 @@ def rerank(image_name,num,code_dic,query):
     #print(distance)
     dis = np.array(distance)
     index = np.argsort(dis,kind = 'mergesort')
+    #resort the index
+    if nrnk < num:
+        index[nrnk:] = np.sort(index[nrnk:],kind = 'mergesort')
+         
+    print(index)
+    
     rnk = np.array(sub_image)[index]
     image_name[:num] = list(rnk)
     return image_name
@@ -64,7 +72,8 @@ if __name__ == '__main__':
     parser.add_argument('-c','--code',required = True,help="the path of binary code produced by ITQ")
     parser.add_argument('-r','--rankedFiles',required = True,help="the dictionary of ranked files produced by image retrieval")
     parser.add_argument('-l','--label',required = True,help="the path of oxford labels which contains the imfornation of query image")	
-    parser.add_argument('-n','--number',type=int,required =True,help="the number of images need to be reranked")
+    parser.add_argument('-nr','--nrnk',type=int,required =True,help="the number of images need to rerank")    
+    parser.add_argument('-n','--number',type=int,required =True,help="the number of images need to compute hamming distance")
     parser.add_argument('-e','--evaluate',required = True,help="path to the compute_ap to evaluate Oxford / paris")
     parser.add_argument('-o','--output',required = True,help="dictionary to store reranked file ")
     args = parser.parse_args()
@@ -83,7 +92,7 @@ if __name__ == '__main__':
             query = code_dic[query_image]
             #get image list
             images_list = read_rnk_as_list(filename_r)
-            reranked_imgs = rerank(images_list,args.number,code_dic,query)
+            reranked_imgs = rerank(images_list,args.number,args.nrnk,code_dic,query)
             #write result after reranking
             #this result is for evaluate 
             out_file = args.output + '/' +fil
@@ -104,6 +113,7 @@ if __name__ == '__main__':
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         score [result[:-4]]= float(p.stdout.readlines()[0]) 
         p.wait()
+        
     for key,value in score.items():
         print ( "{0}: {1:.2f}".format(key, 100 * value) )
             

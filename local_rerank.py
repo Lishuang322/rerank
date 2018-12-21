@@ -54,7 +54,7 @@ def rerank(image_name,num,nrnk,code_dic,query):
     if nrnk < num:
         index[nrnk:] = np.sort(index[nrnk:],kind = 'mergesort')
          
-    print(index)
+    #print(index)
     
     rnk = np.array(sub_image)[index]
     image_name[:num] = list(rnk)
@@ -113,11 +113,11 @@ if __name__ == '__main__':
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         score [result[:-4]]= float(p.stdout.readlines()[0]) 
         p.wait()
-        
+    print('\n')   
     for key,value in score.items():
         print ( "{0}: {1:.2f}".format(key, 100 * value) )
             
-        print ( 20 * "-" )
+    print ( 20 * "-" )
     print ( "Mean: {0:.2f}".format(100 * np.mean(score.values())) )
 
 

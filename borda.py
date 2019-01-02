@@ -71,6 +71,8 @@ if __name__ == '__main__':
 
 
     #step2:apply borda algorithm
+    if not os.path.exists(args.output):
+        os.mkdir(args.output) 
     for fil in os.listdir(args.binary):
         if fil[-3:] == 'rnk':
             filename_binary = args.binary + '/' +fil
